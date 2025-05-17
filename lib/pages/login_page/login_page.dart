@@ -16,6 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   final apiService = ApiService();
   final authService = AuthService();
   String? errorMessage;
+  final phoneFocusNode = FocusNode();
+  final passwordFocusNode = FocusNode();
 
   void login() async {
     final phone = phoneController.text.trim();
@@ -34,10 +36,25 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      setState(() {
-        errorMessage = response['message'] ?? 'Login failed';
-      });
+      _showErrorDialog(response['message'] ?? 'Login failed');
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Login Failed'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
@@ -50,10 +67,15 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             TextField(
               controller: phoneController,
+              focusNode: phoneFocusNode,
               decoration: InputDecoration(labelText: 'Phone'),
+              onSubmitted: (_) {
+                FocusScope.of(context).requestFocus(passwordFocusNode);
+              },
             ),
             TextField(
               controller: passwordController,
+              focusNode: passwordFocusNode,
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
