@@ -1,7 +1,6 @@
-// lib/pages/main_page/main_page.dart
+import 'package:flutter/material.dart';
 import 'package:admin_app_flutter/pages/Robot_Slots/robot_slots.dart';
 import 'package:admin_app_flutter/pages/Robot_Tray/robot_tray.dart';
-import 'package:flutter/material.dart';
 import 'package:admin_app_flutter/auth/auth_service.dart';
 import 'package:admin_app_flutter/pages/login_page/login_page.dart';
 
@@ -32,7 +31,6 @@ class _MainPageState extends State<MainPage> {
   void logout(BuildContext context) async {
     await AuthService().clearToken();
     Navigator.pushReplacement(
-      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(builder: (_) => const LoginPage()),
     );
@@ -51,9 +49,11 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text("Welcome ${widget.userName}"),
+        title: Text('Welcome, ${widget.userName}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -63,36 +63,55 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 60,
-            child: ListView.builder(
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              itemCount: robotOptions.length,
-              itemBuilder: (context, index) {
-                final option = robotOptions[index];
-                final isSelected = option == selectedOption;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 10,
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() => selectedOption = option);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isSelected ? Colors.blue : Colors.grey[300],
-                      foregroundColor: isSelected ? Colors.white : Colors.black,
-                    ),
-                    child: Text(option),
-                  ),
-                );
-              },
+              child: Row(
+                children:
+                    robotOptions.map((option) {
+                      final isSelected = option == selectedOption;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() => selectedOption = option);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            elevation: isSelected ? 3 : 0,
+                            backgroundColor:
+                                isSelected ? theme.primaryColor : Colors.white,
+                            foregroundColor:
+                                isSelected ? Colors.white : Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(
+                                color:
+                                    isSelected
+                                        ? theme.primaryColor
+                                        : Colors.grey.shade300,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: Text(option),
+                        ),
+                      );
+                    }).toList(),
+              ),
             ),
           ),
           const Divider(height: 1),
-          Expanded(child: _getContent()),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _getContent(),
+            ),
+          ),
         ],
       ),
     );
